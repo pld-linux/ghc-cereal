@@ -1,12 +1,12 @@
 %define		pkgname	cereal
 Summary:	A Haskell binding to the cereal graphics library
 Name:		ghc-%{pkgname}
-Version:	0.3.5.2
+Version:	0.5.8.1
 Release:	1
 License:	BSD
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	e657b840afe3d8b9c803362a106ffc8a
+# Source0-md5:	4f5e41ee3371272daa12a2d073d2fd4f
 URL:		http://hackage.haskell.org/package/cereal/
 BuildRequires:	ghc >= 6.12.3
 BuildRequires:	rpmbuild(macros) >= 1.608
