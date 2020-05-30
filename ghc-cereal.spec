@@ -1,14 +1,21 @@
+#
+# Conditional build:
+%bcond_without	prof	# profiling library
+#
 %define		pkgname	cereal
 Summary:	A Haskell binding to the cereal graphics library
 Name:		ghc-%{pkgname}
 Version:	0.5.8.1
-Release:	1
+Release:	2
 License:	BSD
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
 # Source0-md5:	4f5e41ee3371272daa12a2d073d2fd4f
 URL:		http://hackage.haskell.org/package/cereal/
 BuildRequires:	ghc >= 6.12.3
+%if %{with prof}
+BuildRequires:	ghc-prof
+%endif
 BuildRequires:	rpmbuild(macros) >= 1.608
 %requires_eq	ghc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -18,6 +25,20 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 A Haskell binding to the cereal graphics library.
+
+%package prof
+Summary:	Profiling %{pkgname} library for GHC
+Summary(pl.UTF-8):	Biblioteka profilująca %{pkgname} dla GHC
+Group:		Development/Libraries
+Requires:	%{name} = %{version}-%{release}
+
+%description prof
+Profiling %{pkgname} library for GHC.  Should be installed when
+GHC's profiling subsystem is needed.
+
+%description prof -l pl.UTF-8
+Biblioteka profilująca %{pkgname} dla GHC. Powinna być zainstalowana
+kiedy potrzebujemy systemu profilującego z GHC.
 
 %package doc
 Summary:	HTML documentation for %{pkgname}
@@ -35,6 +56,7 @@ Dokumentacja w formacie HTML dla %{pkgname}.
 
 %build
 runhaskell Setup.lhs configure -v2 \
+	%{?with_prof:--enable-library-profiling} \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
 	--libexecdir=%{_libexecdir} \
@@ -69,7 +91,25 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.so
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.a
+%exclude %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
+
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/*.dyn_hi
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/Serialize
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/Serialize/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/Serialize/*.dyn_hi
+
+%if %{with prof}
+%files prof
+%defattr(644,root,root,755)
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/*.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Data/Serialize/*.p_hi
+%endif
 
 %files doc
 %defattr(644,root,root,755)
